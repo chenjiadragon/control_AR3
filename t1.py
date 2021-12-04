@@ -1,7 +1,7 @@
 import math
 import time
 
-import sympy
+# import sympy
 
 import myEI
 import serial
@@ -37,38 +37,38 @@ if __name__ == '__main__':
    baud = 115200
    ser = serial.Serial(port, baud)
 
-   # # 发送命令
-   # while True:
-   #    command = input("> ")
-   #    if (command[0] == 'q'):
-   #       break
-   #    myEI.EI(command, ser)
+   # 发送命令
+   while True:
+      command = input("> ")
+      if (command[0] == 'q'):
+         break
+      myEI.EI(command, ser)
 
-   # 初始化
-   time.sleep(1)
-   command = "calRobot"
-   myEI.EI(command, ser)
-   time.sleep(1)
+#    # 初始化
+# #    time.sleep(1)
+# #    command = "calRobot"
+# #    myEI.EI(command, ser)
+# #    time.sleep(1)
 
-   command = "was 0 -132 141 165 -10.4 -75.27"
-   myEI.EI(command, ser)
+# #    command = "was 0 -132 141 165 -10.4 -75.27"
+# #    myEI.EI(command, ser)
 
-   time.sleep(1)
-   l = move_arm(400, 0, 300)
-   print(l)
+# #    time.sleep(1)
+# #    l = move_arm(400, 0, 300)
+# #    print(l)
 
-   # time.sleep(1)
-   # command = "wa 2 "+ str(l[0])
-   # myEI.EI(command, ser)
-   # command = "wa 3 "+str(l[1])
-   # myEI.EI(command, ser)
+#    # time.sleep(1)
+#    # command = "wa 2 "+ str(l[0])
+#    # myEI.EI(command, ser)
+#    # command = "wa 3 "+str(l[1])
+#    # myEI.EI(command, ser)
 
-   command = "wa 2 -52"
-   myEI.EI(command, ser)
-   command = "wa 3 122"
-   myEI.EI(command, ser)
+#    command = "wa 2 -52"
+#    myEI.EI(command, ser)
+#    command = "wa 3 122"
+#    myEI.EI(command, ser)
 
-   time.sleep(1)
+#    time.sleep(1)
 
 
    # # 退出循环
