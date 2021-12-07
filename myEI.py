@@ -597,6 +597,13 @@ def CalcRevKin(CX, CY, CZ, CRx, CRy, CRz):
     angle[4] = Q7
     angle[5] = Q8
     angle[6] = Q9
+    
+    for i in range(1, 7):
+    if angle[i] < JNegAngLim[i]:
+        angle[i] += 180
+    elif angle[i] > JPosAngLim[i]:
+        angle[i] -= 180
+    
     return angle
 
 
