@@ -16,7 +16,7 @@ DHt = [0.0] * 7
 JNegAngLim = [0] * 7
 JPosAngLim = [0] * 7
 JStepLim = [0] * 7
-JDegPerStep = [0] * 7   # 每步移动步数
+JDegPerStep = [0] * 7   # 每步移动度数
 JStepCur = [0] * 7
 JAngCur = [0] * 7
 global XcurPos
@@ -597,19 +597,18 @@ def CalcRevKin(CX, CY, CZ, CRx, CRy, CRz):
     angle[4] = Q7
     angle[5] = Q8
     angle[6] = Q9
-    
+
     for i in range(1, 7):
-    if angle[i] < JNegAngLim[i]:
-        angle[i] += 180
-    elif angle[i] > JPosAngLim[i]:
-        angle[i] -= 180
-    
+        if angle[i] < JNegAngLim[i]:
+            angle[i] += 180
+        elif angle[i] > JPosAngLim[i]:
+            angle[i] -= 180
+
     return angle
 
 
 # 命令解释器
 def EI(command, ser):
-    time_start = time.time()
     # 全局变量声明
     global speed
     global ACCdur
@@ -626,6 +625,7 @@ def EI(command, ser):
     # 命令处理
     x = command.split()
     if (x[0] == "calRobot"):
+        speed_temp = speed
         speed = 50
         J1caldrive = "0"
         J2caldrive = "0"
@@ -639,23 +639,20 @@ def EI(command, ser):
         J4step = str(JStepLim[4])
         J5step = str(JStepLim[5])
         J6step = str(JStepLim[6])
-        # time_start = time.time()
         command = "LL" + "A" + J1caldrive + J1step + "B" + J2caldrive + J2step + "C" + J3caldrive + J3step + "D" + J4caldrive + J4step + "E" + J5caldrive + J5step + "F" + J6caldrive + J6step + "S" + str(
             speed) + "\n"
         ser.write(command.encode())
         ser.flushInput()
-        # time_end = time.time()
-        # print('time cost', time_end - time_start, 's')
         calvalue = ser.read()
-
-        if (calvalue == b'P'):
-            print(calvalue)
-            pass
-        else:
-            if (calvalue == b'F'):
-                print("CALIBRATION FAILED")
-            else:
-                print("NO CAL FEEDBACK FROM ARDUINO")
+        #
+        # if (calvalue == b'P'):
+        #     print("CALIBRATION SUCCESSFUL")
+        #     pass
+        # else:
+        #     if (calvalue == b'F'):
+        #         print("CALIBRATION FAILED")
+        #     else:
+        #         print("NO CAL FEEDBACK FROM ARDUINO")
         J1caldrive1 = "1"
         J2caldrive1 = "1"
         J3caldrive1 = "0"
@@ -681,14 +678,16 @@ def EI(command, ser):
                     JAngCur[i + 1] = JNegAngLim[i + 1]
             # CalcFwdKin()
             myCalcFwdKin()
+            print("CALIBRATION SUCCESSFUL")
         else:
             if (calvalue == b'F'):
                 print("CALIBRATION FAILED")
             else:
                 print("NO CAL FEEDBACK FROM ARDUINO")
-        speed = 50
+        speed = speed_temp
     elif (x[0] == "mj"):
         Jnum = int(x[1])
+
         Jflag = chr(ord('A') + Jnum - 1)
         Jdir = int(x[2])
         angle = float(x[3])
@@ -742,7 +741,7 @@ def EI(command, ser):
               "\nJ6:", JAngCur[6])
     elif (x[0] == "wa"):
         Jnum = int(x[1])
-        angle = int(x[2])
+        angle = float(x[2])
         Jflag = chr(ord('A') + Jnum - 1)
         if (angle < JNegAngLim[Jnum] or angle > JPosAngLim[Jnum]):
             print("超出限制！")
@@ -765,17 +764,11 @@ def EI(command, ser):
 
             command = "MJ" + Jflag + str(Jdir) + str(Jstep) + "S" + str(speed) + "G" + str(ACCdur) + "H" + str(
                 ACCspeed) + "I" + str(DECdur) + "K" + str(DECspeed) + "\n"
-            time_end = time.time()
-            print('time cost', time_end - time_start, 's')
             ser.write(command.encode())
-
             ser.flushInput()
-            time_end = time.time()
-            print('time cost', time_end - time_start, 's')
-            time.sleep(.01)
+            # time.sleep(.01)
             ser.read()
-            time_end = time.time()
-            print('time cost', time_end - time_start, 's')
+
         elif (angle > JAngCur[Jnum]):
             Jstep = (angle - JAngCur[Jnum]) / JDegPerStep[Jnum]
             if (Jnum == 4 or Jnum == 6):
@@ -789,7 +782,7 @@ def EI(command, ser):
                 ACCspeed) + "I" + str(DECdur) + "K" + str(DECspeed) + "\n"
             ser.write(command.encode())
             ser.flushInput()
-            time.sleep(.01)
+            # time.sleep(.01)
             ser.read()
         else:
             pass
@@ -804,7 +797,7 @@ def EI(command, ser):
                 break
         if (flag):
             return
-        Jflag = [None, 'A', 'B', 'C', 'D', 'E', 'F']
+        Jflag = [None, "A", "B", "C", "D", "E", "F"]
         Jstep = [0] * 7
         Jdir = [0] * 7
 
@@ -841,7 +834,7 @@ def EI(command, ser):
             ACCspeed) + "I" + str(DECdur) + "K" + str(DECspeed) + "\n"
         ser.write(command.encode())
         ser.flushInput()
-        time.sleep(.01)
+        # time.sleep(.01)
         ser.read()
     elif (x[0] == "gcs"):
         print("X:", XcurPos, "\nY:", YcurPos, "\nZ:", ZcurPos, "\nRX:", RxcurPos, "\nRY:", RycurPos, "\nRZ:", RzcurPos)
@@ -1099,7 +1092,10 @@ def EI(command, ser):
             ACCspeed) + "I" + str(DECdur) + "K" + str(DECspeed) + "\n"
         ser.write(command.encode())
         ser.flushInput()
-        time.sleep(.01)
+        time.sleep(.01
+
+
+                   )
         ser.read()
 
     elif (x[0] == "TM"):
@@ -1111,17 +1107,26 @@ def EI(command, ser):
         echo = ser.readline()
         print(echo)
 
+    elif (x[0] == "Out" and x[1] == "On"):
+        outputNum = x[2]
+        command = "ONX" + outputNum + "\n"
+        ser.write(command.encode())
+        ser.flushInput()
+        # time.sleep(.2)
+        ser.read()
+    elif (x[0] == "Out" and x[1] == "Off"):
+        outputNum = x[2]
+        command = "OFX" + outputNum + "\n"
+        ser.write(command.encode())
+        ser.flushInput()
+        # time.sleep(.2)
+        ser.read()
 
-    # elif (x[0] == "q"):
-    #     print("按q停止！")
-    #     return
-    # time_end = time.time()
-    # print('time cost', time_end - time_start, 's')
 
 
 if __name__ == '__main__':
     # 串口通信
-    port = "COM4"
+    port = "COM7"
     baud = 115200
     ser = serial.Serial(port, baud)
 
